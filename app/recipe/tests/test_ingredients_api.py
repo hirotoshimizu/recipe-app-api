@@ -49,7 +49,7 @@ class PrivateIngredientsApiTests(TestCase):
         # print('serializer')
         # print(serializer)
         # print('serializer.data')
-        # print(serializer.data)        
+        # print(serializer.data)
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertEqual(res.data, serializer.data)
 
@@ -69,3 +69,21 @@ class PrivateIngredientsApiTests(TestCase):
         print('res.data')
         print(res.data)
         self.assertEqual(res.data[0]['name'], ingredient.name)
+
+    def test_create_ingredient_successful(self):
+        """Test create a nre ingredient"""
+        payload = {'name': 'Cabbege'}
+        self.client.post(INGREDIENTS_URL, payload)
+
+        exists = Ingredient.objects.filter(
+            user=self.user,
+            name=payload['name'],
+        ).exists()
+        self.assertTrue(exists)
+
+    def test_create_ingredient_invalid(self):
+        """Test creating invalid ingrediant fails"""
+        payload = {'name': ''}
+        res = self.client.post(INGREDIENTS_URL, payload)
+
+        self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
